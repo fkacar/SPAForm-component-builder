@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src",
+    "types",
+    "src/types"
+  ],
+  "compilerOptions": {
+    "rootDir": "./src",
+    "declaration": true,
+    "strict": false,
+    "jsx": "react"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "name": "spaform-component-builder",
+  "version": "0.1.0",
+  "description": "SPAForm auto-generates your project's similar components like forms and tables just using UI with drag and drop feature. SPAForm saves a lot of time!",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "Fatih Kacar <info@fatihkacar.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fkacar/SPAForm-component-builder"
+  },
+  "license": "MIT",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "react",
+    "vue",
+    "angular",
+    "form",
+    "table",
+    "builder",
+    "generator",
+    "similar components"
+  ],
+  "scripts": {
+    "build": "tsdx build --tsconfig tsconfig.build.json --jsx react"
+  },
+  "dependencies": {
+    "@types/jest": "^28.1.6",
+    "@types/node": "^18.6.1",
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6",
+    "antd": "^4.23.2",
+    "better-module-alias": "^1.1.0",
+    "classnames": "^2.3.2",
+    "formik": "^2.2.9",
+    "json-schema-to-yup": "^1.8.8",
+    "reactstrap": "^9.1.4",
+    "tsdx": "^0.14.1",
+    "typescript": "^4.7.4",
+    "yup": "^0.32.11"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.18.9",
+    "@babel/eslint-parser": "^7.18.9",
+    "@babel/node": "^7.18.9",
+    "@babel/preset-react": "^7.18.6",
+    "@babel/preset-typescript": "^7.18.6",
+    "babel": "^6.23.0",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-runtime": "^6.26.0",
+    "tsconfig-paths-webpack-plugin": "^4.0.0",
+    "typescript-tslint-plugin": "^1.0.2"
+  },
+  "_moduleAliases": {
+    "$src": "./src"
+  }
+}
