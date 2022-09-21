@@ -1,7 +1,7 @@
 {
-  "name": "spaform-component-builder",
+  "name": "@formactor/react",
   "version": "0.1.0",
-  "description": "SPAForm auto-generates your project's similar components like forms and tables just using UI with drag and drop feature. SPAForm saves a lot of time!",
+  "description": "Formactor SPA Form Component Builder auto-generates your project's similar components like forms and tables just using UI with drag and drop feature. SPAForm saves a lot of time!",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
