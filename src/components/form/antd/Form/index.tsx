@@ -1,15 +1,21 @@
 import React, {FC, useState, useEffect, createRef, useRef} from 'react'
+// @ts-ignore
+import {useProgState} from 'react-use-prog-state'
 import {IFormGeneratorColumnItem} from '../../../../types/rebuilder'
 import {IFormAntdProps} from '../../../../types/form-antd'
-import {Form} from 'antd'
+import {Form, Tabs} from 'antd'
 import {Row, Col} from 'reactstrap'
 import * as yup from 'yup'
 import {buildYup} from 'json-schema-to-yup'
 import formItems from '../../../../assets/data/forms/antd/form-items'
 
+const {TabPane} = Tabs
+
 const FormAntd: FC<IFormAntdProps> = ({data}) => {
+    const [activeKey, setActiveKey] = useState<string>('required')
     const lastItemRefIndex = useRef<number>(1)
-    const yupSchema = buildYup(data.validationScheme)
+    const validationScheme = typeof data.validationScheme === 'string' ? JSON.parse(data.validationScheme) : data.validationScheme
+    const yupSchema = buildYup(validationScheme)
 
     const yupSync: any = {
         async validator({field}: { field: any }, value: any) {
@@ -39,7 +45,8 @@ const FormAntd: FC<IFormAntdProps> = ({data}) => {
 
     const FormItemComponent: FC<any> = (props) => {
         const formItemComponents = formItems(data.uiKit || 'antd')
-        const formItemComponent = [...formItemComponents].find((formItem: any) => formItem.id === props.item.component)?.render({...props, ...props.item.props, ...props.item})
+        const formItemComponent = [...formItemComponents]
+            .find((formItem: any) => formItem.id === props.item.component)?.render({...props, ...props.item.props, ...props.item})
 
         return <>{formItemComponent}</>
     }
@@ -57,18 +64,31 @@ const FormAntd: FC<IFormAntdProps> = ({data}) => {
     const getIndexedData = () => {
         const dataStored = {...data}
 
-        dataStored.columns.forEach((column) => {
+        const dataStoredColumns = dataStored.columns.filter((column) => column.tabKey === activeKey)
+
+        dataStoredColumns.forEach((column) => {
             column.items.forEach((item) => {
                 item.index = lastItemRefIndex.current
                 lastItemRefIndex.current++
             })
         })
 
+        dataStored.columns = dataStoredColumns
+
         return dataStored
+    }
+
+    const onChangeTab = (newActiveKey: string) => {
+        setActiveKey(newActiveKey)
     }
 
     return (
         <main className="form-wrapper">
+            <Tabs type="card" onChange={onChangeTab} activeKey={activeKey}>
+                {data.tabs.map((pane: any, index: number) => (
+                    <TabPane tab={pane.title} key={pane.key} closable={pane.closable}/>
+                ))}
+            </Tabs>
             <Form
                 name="basic"
                 onFinish={onFinish}
@@ -83,18 +103,29 @@ const FormAntd: FC<IFormAntdProps> = ({data}) => {
                              key={`auto_generated_form_col_${index}`}>
                             <aside className="form-col-inner-wrapper">
                                 {column.items.map((item: IFormGeneratorColumnItem, indexItem: number) => (
-                                    <Form.Item
-                                        label={item.label}
-                                        name={item.name}
-                                        rules={[yupSync]}
-                                        key={`auto_generated_form_item_${indexItem}`}
-                                    >
-                                        <FormItemComponent
-                                            onInputKeyDownFn={(e: any) => onInputKeyDown(e, item.index)}
-                                            innerRef={inputRefs[item.index]}
-                                            item={item}
-                                        />
-                                    </Form.Item>
+                                    <>
+                                        {item.component === 'button' && (
+                                            <FormItemComponent
+                                                onInputKeyDownFn={(e: any) => onInputKeyDown(e, item.index)}
+                                                innerRef={inputRefs[item.index]}
+                                                item={item}
+                                            />
+                                        )}
+                                        {item.component !== 'button' && (
+                                            <Form.Item
+                                                label={item.label}
+                                                name={item.name}
+                                                rules={[yupSync]}
+                                                key={`auto_generated_form_item_${indexItem}`}
+                                            >
+                                                <FormItemComponent
+                                                    onInputKeyDownFn={(e: any) => onInputKeyDown(e, item.index)}
+                                                    innerRef={inputRefs[item.index]}
+                                                    item={item}
+                                                />
+                                            </Form.Item>
+                                        )}
+                                    </>
                                 ))}
                             </aside>
                         </Col>

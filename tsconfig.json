@@ -32,6 +32,9 @@
     "plugins": [
       {
         "name": "typescript-tslint-plugin"
+      },
+      {
+        "name": "typescript-plugin-css-modules"
       }
     ]
   },
@@ -47,7 +50,8 @@
     "tslint-config-prettier"
   ],
   "include": [
-    "src"
+    "src",
+    "declaration.d.ts"
   ],
   "extends": "./base-tsconfig.json"
 }

@@ -1,6 +1,6 @@
 export interface IFormGeneratorColumnItem {
-    component: 'input' | 'select' | 'checkbox' | 'radio' | 'textarea'
-    props: any,
+    component: 'input' | 'select' | 'checkbox' | 'radio' | 'textarea' | 'button'
+    props: any
     name: string
     label?: string
     initialValue: any
@@ -9,6 +9,7 @@ export interface IFormGeneratorColumnItem {
 
 export interface IFormGeneratorColumn {
     items: IFormGeneratorColumnItem[]
+    tabKey: string
     colXs: number
     colSm: number
     colMd: number
@@ -16,8 +17,16 @@ export interface IFormGeneratorColumn {
     colXl: number
 }
 
+export interface IFormGeneratorTab {
+    title: string
+    content?: string
+    key: string
+    closable: boolean
+}
+
 export interface IFormGenerator {
     columns: IFormGeneratorColumn[]
+    tabs: IFormGeneratorTab[]
     endpoint: string
     requestMethod: 'post' | 'put' | 'get'
     autoComplete?: 'on' | 'off'
@@ -26,5 +35,6 @@ export interface IFormGenerator {
 }
 
 export interface IPropsRebuilder {
-    data: IFormGenerator
+    data?: IFormGenerator
+    keyPath?: string
 }
