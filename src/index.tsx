@@ -19,7 +19,7 @@ export const config = (configModel: IConfig) => {
     Cookies.set('formactor-config', JSON.stringify(configModel))
 }
 
-export const Rebuilder: FC<IPropsRebuilder> = ({data, keyPath}) => {
+export const Rebuilder: FC<IPropsRebuilder> = ({data, keyPath, onBeforeSubmit, onSubmitFinish, onErrorSubmit}) => {
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string>()
     const [dataFinal, setDataFinal] = useState<IFormGenerator>()
@@ -35,7 +35,8 @@ export const Rebuilder: FC<IPropsRebuilder> = ({data, keyPath}) => {
 
         const FormComponent = mapper[dataFinal.uiKit || 'antd']
 
-        return <FormComponent data={dataFinal}/>
+        return <FormComponent data={dataFinal} onBeforeSubmit={onBeforeSubmit} onSubmitFinish={onSubmitFinish}
+                              onErrorSubmit={onErrorSubmit}/>
     }
 
     const getData = async () => {

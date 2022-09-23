@@ -8,14 +8,16 @@ import {Row, Col} from 'reactstrap'
 import * as yup from 'yup'
 import {buildYup} from 'json-schema-to-yup'
 import formItems from '../../../../assets/data/forms/antd/form-items'
+import {submitForm} from '../../../../services/submit.service'
 
 const {TabPane} = Tabs
 
-const FormAntd: FC<IFormAntdProps> = ({data}) => {
-    const [activeKey, setActiveKey] = useState<string>('required')
+const FormAntd: FC<IFormAntdProps> = ({data, onBeforeSubmit, onSubmitFinish, onErrorSubmit}) => {
+    const [activeKey, setActiveKey] = useState<string>('')
     const lastItemRefIndex = useRef<number>(1)
     const validationScheme = typeof data.validationScheme === 'string' ? JSON.parse(data.validationScheme) : data.validationScheme
     const yupSchema = buildYup(validationScheme)
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
     const yupSync: any = {
         async validator({field}: { field: any }, value: any) {
@@ -23,12 +25,34 @@ const FormAntd: FC<IFormAntdProps> = ({data}) => {
         }
     }
 
-    const onFinish = (values: any) => {
-        console.log('Success:', values)
+    const onFinish = async (values: any) => {
+        const requestModel = onBeforeSubmit(values)
+
+        setIsSubmitting(true)
+        let result
+        let error
+
+        try {
+            result = await submitForm(requestModel)
+        } catch (e) {
+            console.error(e)
+            result = false
+            error = e
+        }
+
+        setIsSubmitting(false)
+
+        if (error) {
+            onErrorSubmit(error)
+
+            return
+        }
+
+        onSubmitFinish(result)
     }
 
     const onFinishFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo)
+        onErrorSubmit(errorInfo)
     }
 
     const getInitialValues = () => {
@@ -82,6 +106,12 @@ const FormAntd: FC<IFormAntdProps> = ({data}) => {
         setActiveKey(newActiveKey)
     }
 
+    useEffect(() => {
+        if (!data) return
+
+        if (!activeKey) setActiveKey(data.tabs[0].key)
+    }, [data])
+
     return (
         <main className="form-wrapper">
             <Tabs type="card" onChange={onChangeTab} activeKey={activeKey}>
@@ -109,6 +139,7 @@ const FormAntd: FC<IFormAntdProps> = ({data}) => {
                                                 onInputKeyDownFn={(e: any) => onInputKeyDown(e, item.index)}
                                                 innerRef={inputRefs[item.index]}
                                                 item={item}
+                                                loading={isSubmitting}
                                             />
                                         )}
                                         {item.component !== 'button' && (

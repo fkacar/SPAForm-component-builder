@@ -27,14 +27,23 @@ export interface IFormGeneratorTab {
 export interface IFormGenerator {
     columns: IFormGeneratorColumn[]
     tabs: IFormGeneratorTab[]
-    endpoint: string
-    requestMethod: 'post' | 'put' | 'get'
     autoComplete?: 'on' | 'off'
     uiKit?: 'antd' | 'reactstrap' | 'material-ui'
     validationScheme: any
 }
 
+export interface IBeforeSubmit {
+    endpoint: string
+    requestMethod: 'post' | 'put' | 'get' | 'delete' | 'patch' | 'POST' | 'PUT' | 'GET' | 'DELETE' | 'PATCH'
+    headers?: any
+    body?: object
+    queryParams?: object
+}
+
 export interface IPropsRebuilder {
     data?: IFormGenerator
     keyPath?: string
+    onBeforeSubmit: (values: object) => IBeforeSubmit
+    onSubmitFinish?: (serverResponse: any) => void
+    onErrorSubmit?: (formError: any) => void
 }
