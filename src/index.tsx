@@ -1,5 +1,6 @@
 import React, {FC, useState, useEffect} from 'react'
 import {IPropsRebuilder, IFormGenerator} from './types/rebuilder'
+import FormBuilderComponent from './components/builder/form'
 import {Spin, Alert} from 'antd'
 import Cookies from 'js-cookie'
 import {getFormData} from './services/form-data.service'
@@ -96,3 +97,5 @@ export const Rebuilder: FC<IPropsRebuilder> = ({data, keyPath, onBeforeSubmit, o
         </main>
     )
 }
+
+export const FormBuilder = FormBuilderComponent

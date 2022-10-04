@@ -3,14 +3,15 @@
  babel.config.js with useful plugins.
  */
 module.exports = function (api) {
-  api.cache(true)
-  api.assertVersion('^7.4.5')
+    api.cache(true)
+    api.assertVersion('^7.4.5')
 
-  const presets = ['@babel/preset-typescript']
+    const presets = ['@babel/preset-typescript']
 
-  const plugins = []
+    const plugins = ['babel-plugin-macros', 'babel-plugin-styled-components']
 
-  return {
-    presets
-  }
+    return {
+        presets,
+        plugins
+    }
 }

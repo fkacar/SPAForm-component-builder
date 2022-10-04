@@ -1,6 +1,6 @@
 {
   "name": "@formactor/react",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Formactor SPA Form Component Builder auto-generates your project's similar components like forms and tables just using UI with drag and drop feature. SPAForm saves a lot of time!",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -26,6 +26,7 @@
     "similar components"
   ],
   "scripts": {
+    "dev": "tsdx watch --tsconfig tsconfig.build.json --jsx react",
     "build": "tsdx build --tsconfig tsconfig.build.json --jsx react"
   },
   "dependencies": {
@@ -40,8 +41,11 @@
     "formik": "^2.2.9",
     "js-cookie": "^3.0.1",
     "json-schema-to-yup": "^1.8.8",
+    "react-beautiful-dnd": "^13.1.1",
+    "react-grid-layout": "^1.3.4",
     "reactstrap": "^9.1.4",
     "sass": "^1.55.0",
+    "styled-components": "^5.3.5",
     "tsdx": "^0.14.1",
     "typescript": "^4.7.4",
     "yup": "^0.32.11"
@@ -55,10 +59,15 @@
     "babel": "^6.23.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
+    "babel-plugin-macros": "^3.1.0",
+    "babel-plugin-styled-components": "^2.0.7",
     "babel-runtime": "^6.26.0",
     "tsconfig-paths-webpack-plugin": "^4.0.0",
     "typescript-plugin-css-modules": "^3.4.0",
     "typescript-tslint-plugin": "^1.0.2"
+  },
+  "resolutions": {
+    "styled-components": "^5"
   },
   "_moduleAliases": {
     "$src": "./src"
