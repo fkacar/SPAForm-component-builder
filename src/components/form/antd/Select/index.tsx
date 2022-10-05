@@ -16,10 +16,11 @@ export interface IPropsSelect {
     value?: string
     onChange?: (e: any) => void
     options: IOptions[]
+    inputLabel?: string
 }
 
 const SelectComponent: FC<IPropsSelect> = (props) => {
-    const {innerRef, onInputKeyDownFn} = props
+    const {innerRef, onInputKeyDownFn, inputLabel} = props
 
     const [isOpen, setIsOpen] = useState(false)
 
@@ -37,19 +38,22 @@ const SelectComponent: FC<IPropsSelect> = (props) => {
     }
 
     return (
-        <Select
-            {...props}
-            onInputKeyDown={onInputKeyDownFn}
-            open={isOpen}
-            onFocus={onFocusHandler}
-            onBlur={onBlurHandler}
-            onChange={onChangeHandler}
-            ref={innerRef}
-        >
-            {props.options.map((option: IOptions) => (
-                <Select.Option value={option.value}>{option.label}</Select.Option>
-            ))}
-        </Select>
+        <>
+            {inputLabel && <div className="input-label">{inputLabel}</div>}
+            <Select
+                {...props}
+                onInputKeyDown={onInputKeyDownFn}
+                open={isOpen}
+                onFocus={onFocusHandler}
+                onBlur={onBlurHandler}
+                onChange={onChangeHandler}
+                ref={innerRef}
+            >
+                {props.options.map((option: IOptions) => (
+                    <Select.Option value={option.value}>{option.label}</Select.Option>
+                ))}
+            </Select>
+        </>
     )
 }
 

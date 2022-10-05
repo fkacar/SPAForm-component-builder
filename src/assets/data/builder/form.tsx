@@ -66,13 +66,7 @@ const itemsAntd = [
             <Tabs {...props} />
         ),
         defaultProps: {
-            data: [
-                {
-                    key: 'general',
-                    title: 'General',
-                    closable: false
-                }
-            ]
+            type: 'editable-card'
         }
     },
     {

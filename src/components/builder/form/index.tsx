@@ -3,6 +3,9 @@ import {IPropsBuilder} from '../../../types/builder'
 import {makeid} from '../../../utils/calculation'
 import elements from '../../../assets/data/builder/form'
 import LayoutItems from './LayoutItems'
+import DesignItems from './DesignItems'
+import AdvancedItems from './AdvancedItems'
+import Tabs, {IPropsTabs} from '../../../components/builder/general/Tabs'
 import {Row, Col} from 'reactstrap'
 import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd'
 import MovePrefix from '../../../components/builder/general/MovePrefix'
@@ -28,8 +31,17 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
     const [newFormItems, setNewFormItems] = useState<any[]>([])
     const [activeKey, setActiveKey] = useState<string>('general')
     const [activeTab, setActiveTab] = useState<'layout' | 'design' | 'advanced' | 'elements'>('elements')
+    const [currentTabs, setCurrentTabs] = useState<any[]>([
+        {
+            key: 'general',
+            title: 'General',
+            closable: false,
+            isTab: true
+        }
+    ])
     const [activeConfig, setActiveConfig] = useState<string>('')
     const [activeConfigId, setActiveConfigId] = useState<string>('')
+    const [isTabsVisible, setCurrentTabsVisible] = useState<boolean>(true)
     const [columns, setColumns] = useState<any[]>([
         {
             tabKey: 'general',
@@ -54,8 +66,52 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
         }
     ])
     const [customState, setCustomState] = useState<any>({
-        columnCount: 2
+        columnCount: 2,
+        name: 'General',
+        hidden: 'false'
     })
+
+    const onChangeHidden = (value: any) => {
+        switch (activeConfigId) {
+            case 'tab':
+                if (value === 'true') {
+                    setCurrentTabsVisible(false)
+                    break
+                }
+
+                setCurrentTabsVisible(true)
+                break
+
+            default:
+                break
+        }
+
+        setCustomState({
+            ...customState,
+            hidden: value
+        })
+    }
+
+    const onChangeName = (e: any) => {
+        const name = e.target.value
+
+        switch (activeConfigId) {
+            case 'tab':
+                const currentTabsTemp = [...currentTabs]
+                const currentTab = currentTabsTemp.find((tab: any) => tab.key === activeKey)
+                currentTab.title = name
+                setCurrentTabs(currentTabsTemp)
+                break
+
+            default:
+                break
+        }
+
+        setCustomState({
+            ...customState,
+            name
+        })
+    }
 
     const onChangeColumnCount = (value: string) => {
         const columnsTemp = [...columns]
@@ -81,13 +137,19 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
 
         column.columns = newColumns
         setColumns(columnsTemp)
+        setCustomState({
+            ...customState,
+            columnCount: value
+        })
     }
 
     const onChangeCustomState = (key: string, value: any) => {
         if (!key) return
 
         const customStateUpdateListeners = {
-            columnCount: onChangeColumnCount
+            columnCount: onChangeColumnCount,
+            name: onChangeName,
+            hidden: onChangeHidden
         }
 
         customStateUpdateListeners[key](value)
@@ -130,6 +192,16 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
         )
     }
 
+    const getFormAdvancedOptions = () => {
+        if (!activeConfigId) return <></>
+
+        return (
+            <SidebarBodyListContent>
+                <AdvancedItems component={activeConfigId} onStateChange={customStateUpdater} customState={customState}/>
+            </SidebarBodyListContent>
+        )
+    }
+
     const getFormLayoutOptions = () => {
         if (!activeConfigId) return <></>
 
@@ -140,10 +212,22 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
         )
     }
 
+    const getFormDesignOptions = () => {
+        if (!activeConfigId) return <></>
+
+        return (
+            <SidebarBodyListContent>
+                <DesignItems component={activeConfigId} onStateChange={customStateUpdater} customState={customState}/>
+            </SidebarBodyListContent>
+        )
+    }
+
     const getSidebarBodyContent = () => {
         const mapper = {
             elements: getFormElements(),
-            layout: getFormLayoutOptions()
+            layout: getFormLayoutOptions(),
+            design: getFormDesignOptions(),
+            advanced: getFormAdvancedOptions()
         }
 
         const bodyContent = mapper[activeTab]
@@ -160,22 +244,84 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
         setActiveTab('layout')
         setActiveConfig('Tabs')
         setActiveConfigId('tab')
+
+        const tabName = currentTabs.find((item: any) => item.key === tabKey).title
+
+        setCustomState({
+            ...customState,
+            name: tabName
+        })
+    }
+
+    const onTabEdit = (targetKey: string, action: 'add' | 'remove') => {
+        let columnsTemp = [...columns]
+
+        if (action === 'add') {
+            columnsTemp.push(
+                {
+                    tabKey: `tab_${currentTabs.length}`,
+                    columns: [
+                        {
+                            items: [],
+                            colXs: 12,
+                            colSm: 12,
+                            colMd: 12,
+                            colLg: 6,
+                            colXl: 6
+                        },
+                        {
+                            items: [],
+                            colXs: 12,
+                            colSm: 12,
+                            colMd: 12,
+                            colLg: 6,
+                            colXl: 6
+                        }
+                    ]
+                }
+            )
+
+            setColumns(columnsTemp)
+
+            setCurrentTabs([
+                ...currentTabs,
+                {
+                    key: `tab_${currentTabs.length}`,
+                    title: `New Tab ${currentTabs.length}`,
+                    closable: true,
+                    isTab: true
+                }
+            ])
+
+            return
+        }
+
+        let currentTabsTemp = [...currentTabs]
+        currentTabsTemp = currentTabsTemp.filter((item: any) => item.key !== targetKey)
+        columnsTemp = columnsTemp.filter((item: any) => item.tabKey !== targetKey)
+        setCurrentTabs(currentTabsTemp)
+        setColumns(columnsTemp)
     }
 
     const getNewFormItemElem = (item: any) => {
         if (!item) return <></>
 
         let props = {
-            ...item.defaultProps
+            ...item.defaultProps || {}
         }
 
-        if (item.id.includes('tab_')) {
+        if (item.isTab) {
             props = {
                 ...props,
+                data: [...currentTabs],
                 onChangeTab,
                 onClickTab,
-                activeKey
+                onEdit: onTabEdit,
+                activeKey,
+                type: 'editable-card'
             }
+            console.log('props', props)
+            return <Tabs {...props} />
         }
 
         const Element = item.render(props)
@@ -207,7 +353,53 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
 
     const onDragEnd = (result: any) => {
         console.log('result', result)
-        if (!result.destination) {
+        if (!result.destination) return
+
+        if (result.draggableId.includes('tab_')) {
+            const columnsTemp = [...columns]
+            columnsTemp.push(
+                {
+                    tabKey: `tab_${currentTabs.length}`,
+                    columns: [
+                        {
+                            items: [],
+                            colXs: 12,
+                            colSm: 12,
+                            colMd: 12,
+                            colLg: 6,
+                            colXl: 6
+                        },
+                        {
+                            items: [],
+                            colXs: 12,
+                            colSm: 12,
+                            colMd: 12,
+                            colLg: 6,
+                            colXl: 6
+                        }
+                    ]
+                }
+            )
+
+            setColumns(columnsTemp)
+
+            setCurrentTabs([
+                ...currentTabs,
+                {
+                    key: `tab_${currentTabs.length}`,
+                    title: `New Tab ${currentTabs.length}`,
+                    closable: true,
+                    isTab: true
+                }
+            ])
+
+            setCustomState({
+                ...customState,
+                hidden: 'false'
+            })
+
+            setCurrentTabsVisible(true)
+
             return
         }
 
@@ -359,17 +551,13 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
                     <Col xs={10}>
                         <FormBuilderDDWrapper isTabsLayoutActive={checkIfTabsLayoutActive()}>
                             <Row style={{height: '90%'}}>
-                                <Col xs={12} className="tabs-wrapper-col">
-                                    {
-                                        newFormItems
-                                            .filter((item: any) => item.id.includes('tab_'))
-                                            .map((item: any, index: number) => (
-                                                <div key={item.id} style={{display: 'flex'}}>
-                                                    {getNewFormItemElem(item)}
-                                                </div>
-                                            ))
-                                    }
-                                </Col>
+                                {isTabsVisible && (
+                                    <Col xs={12} className="tabs-wrapper-col">
+                                        <div style={{display: 'flex'}}>
+                                            {getNewFormItemElem(currentTabs[0])}
+                                        </div>
+                                    </Col>
+                                )}
                                 {
                                     columns.find((column: any) => column.tabKey === activeKey)?.columns.map((column: any, index: number) => (
                                         <Col

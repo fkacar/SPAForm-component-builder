@@ -79,6 +79,13 @@ export const SidebarBodyListContent = styled.div`
   width: 100%;
   height: 100%;
   padding: 0.6rem;
+
+  .input-label {
+    font-size: 0.9rem;
+    padding-left: 0.5rem;
+    padding-bottom: 0.1rem;
+    padding-top: 0.8rem;
+  }
 `
 
 export const SidebarBodyFormElement = styled.div`

@@ -10,13 +10,17 @@ export interface IPropsInput {
     index?: number
     value?: string
     onChange?: (e: any) => void
+    inputLabel?: string
 }
 
 const InputComponent: FC<IPropsInput> = (props) => {
-    const {innerRef, onInputKeyDownFn} = props
+    const {innerRef, onInputKeyDownFn, inputLabel} = props
 
     return (
-        <Input {...props} onPressEnter={onInputKeyDownFn} ref={innerRef}/>
+        <>
+            {inputLabel && <div className="input-label">{inputLabel}</div>}
+            <Input {...props} onPressEnter={onInputKeyDownFn} ref={innerRef}/>
+        </>
     )
 }
 

@@ -1,10 +1,16 @@
 import React from 'react'
 import AntdSelect, {IPropsSelect as IAntdPropsSelect} from '../../../form/antd/Select'
+import AntdInput, {IPropsInput as IAntdPropsInput} from '../../../../components/form/antd/Input'
 
 const items = {
     select: {
         render: (props: IAntdPropsSelect) => (
             <AntdSelect {...props} />
+        )
+    },
+    input: {
+        render: (props: IAntdPropsSelect) => (
+            <AntdInput {...props} />
         )
     }
 }
@@ -12,38 +18,33 @@ const items = {
 const mapper = {
     tab: [
         {
-            key: 'select',
-            valueStateKey: 'columnCount',
+            key: 'input',
+            valueStateKey: 'name',
             props: {
-                inputLabel: 'Column Count',
                 style: {
                     width: '100%'
                 },
-                placeholder: 'Select column count',
+                placeholder: 'Name...',
+                inputLabel: 'Tab Name'
+            }
+        },
+        {
+            key: 'select',
+            valueStateKey: 'hidden',
+            props: {
+                inputLabel: 'Is All Tabs Hidden?',
+                style: {
+                    width: '100%'
+                },
+                placeholder: 'Select if hidden',
                 options: [
                     {
-                        label: '1 / 12 Column',
-                        value: '1'
+                        label: 'No',
+                        value: 'false'
                     },
                     {
-                        label: '2 / 12 Column',
-                        value: '2'
-                    },
-                    {
-                        label: '3 / 12 Column',
-                        value: '3'
-                    },
-                    {
-                        label: '4 / 12 Column',
-                        value: '4'
-                    },
-                    {
-                        label: '6 / 12 Column',
-                        value: '6'
-                    },
-                    {
-                        label: '12 / 12 Column',
-                        value: '12'
+                        label: 'Yes',
+                        value: 'true'
                     }
                 ]
             }
