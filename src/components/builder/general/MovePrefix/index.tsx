@@ -1,9 +1,13 @@
 import React, {FC} from 'react'
 import {MovePrefixMain, Line, Dot} from './styles'
 
-const MovePrefix: FC = () => {
+export interface IPropsMovePrefix {
+    onClick?: () => void
+}
+
+const MovePrefix: FC<IPropsMovePrefix> = ({onClick}) => {
     return (
-        <MovePrefixMain>
+        <MovePrefixMain onClick={onClick}>
             <Line>
                 <Dot/>
                 <Dot/>

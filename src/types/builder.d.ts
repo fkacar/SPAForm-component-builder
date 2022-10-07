@@ -1,3 +1,8 @@
+interface IOptions {
+    language: string
+    languages: string[]
+}
+
 export interface IPropsBuilder {
-    options?: any
+    options?: IOptions
 }

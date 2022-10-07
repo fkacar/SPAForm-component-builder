@@ -11,6 +11,7 @@ import AntdCheckbox, {IPropsCheckbox as IAntdPropsCheckbox} from '../../../compo
 import AntdRadio, {IPropsRadio as IAntdPropsRadio} from '../../../components/form/antd/Radio'
 import AntdTextarea, {IPropsTextarea as IAntdPropsTextarea} from '../../../components/form/antd/Textarea'
 import AntdButton, {IPropsButton as IAntdPropsButton} from '../../../components/form/antd/Button'
+import AntdSwitch, {IPropsSwitch as IAntdPropsSwitch} from '../../../components/form/antd/Switch'
 
 const itemsReactstrap = [
     {
@@ -56,12 +57,9 @@ const itemsAntd = [
         id: 'tab',
         label: 'Tab',
         static: true,
-        layoutDefaultW: 24,
-        layoutDefaultH: 6,
-        maxWidth: 24,
-        minWidth: 16,
-        minHeight: 4,
-        maxHeight: 20,
+        config: {
+            name: ''
+        },
         render: (props: IPropsTabs) => (
             <Tabs {...props} />
         ),
@@ -72,12 +70,19 @@ const itemsAntd = [
     {
         id: 'input',
         label: 'Input',
-        layoutDefaultW: 24,
-        layoutDefaultH: 6,
-        maxWidth: 24,
-        minWidth: 16,
-        minHeight: 4,
-        maxHeight: 20,
+        config: {
+            languageSpecificParams: ['defaultValue', 'placeholder'],
+            name: '',
+            defaultValue: '',
+            placeholder: '',
+            allowClear: false,
+            size: 'middle',
+            type: 'text',
+            showCount: false,
+            maxLength: 1000,
+            bordered: true,
+            disabled: false
+        },
         render: (props: IAntdPropsInput) => (
             <AntdInput {...props} />
         ),
@@ -86,7 +91,6 @@ const itemsAntd = [
                 cursor: 'pointer'
             },
             onClick: (e: any) => {
-                console.log('yeee5')
                 e.preventDefault()
                 e.stopPropagation()
                 e.nativeEvent.stopImmediatePropagation()
@@ -96,6 +100,11 @@ const itemsAntd = [
     {
         id: 'select',
         label: 'Select',
+        config: {
+            name: '',
+            defaultValue: '',
+            placeholder: ''
+        },
         render: (props: IAntdPropsSelect) => (
             <AntdSelect {...props} />
         ),
@@ -117,6 +126,10 @@ const itemsAntd = [
     {
         id: 'checkbox',
         label: 'Checkbox',
+        config: {
+            name: '',
+            defaultValue: ''
+        },
         render: (props: IAntdPropsCheckbox) => (
             <AntdCheckbox {...props} />
         ),
@@ -125,6 +138,10 @@ const itemsAntd = [
     {
         id: 'radio',
         label: 'Radio',
+        config: {
+            name: '',
+            defaultValue: ''
+        },
         render: (props: IAntdPropsRadio) => (
             <AntdRadio {...props} />
         ),
@@ -133,6 +150,10 @@ const itemsAntd = [
     {
         id: 'textarea',
         label: 'Textarea',
+        config: {
+            name: '',
+            defaultValue: ''
+        },
         render: (props: IAntdPropsTextarea) => (
             <AntdTextarea {...props} />
         ),
@@ -141,6 +162,9 @@ const itemsAntd = [
     {
         id: 'button',
         label: 'Button',
+        config: {
+            name: ''
+        },
         render: (props: IAntdPropsButton) => (
             <AntdButton {...props} />
         ),

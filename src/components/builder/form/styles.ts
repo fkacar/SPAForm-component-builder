@@ -43,6 +43,13 @@ export const SidebarBodyHeader = styled.div`
   background-color: #e2e2e2;
 `
 
+export const SidebarBodyLanguageWrapper = styled.div`
+  background-color: #f2f2f2;
+  text-align: center;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+`
+
 export const SidebarBodyHeaderTab = styled.div`
   width: 33.33%;
   border-right: 1px solid #f2f2f2;
@@ -112,6 +119,10 @@ export const FormBuilderDDWrapper = styled.div`
     &:not(.tabs-wrapper-col) {
       border: ${props => props.isTabsLayoutActive ? "1px dashed green" : "none"};
     }
+  }
+
+  .ant-tabs.ant-tabs-top {
+    width: 100%;
   }
 `
 

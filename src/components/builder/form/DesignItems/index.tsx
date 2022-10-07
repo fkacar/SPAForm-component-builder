@@ -1,6 +1,8 @@
 import React from 'react'
 import AntdSelect, {IPropsSelect as IAntdPropsSelect} from '../../../form/antd/Select'
 import AntdInput, {IPropsInput as IAntdPropsInput} from '../../../../components/form/antd/Input'
+import AntdInputNumber, {IPropsInputNumber as IAntdPropsInputNumber} from '../../../../components/form/antd/InputNumber'
+import AntdSwitch, {IPropsSwitch as IAntdPropsSwitch} from '../../../../components/form/antd/Switch'
 
 const items = {
     select: {
@@ -11,6 +13,16 @@ const items = {
     input: {
         render: (props: IAntdPropsSelect) => (
             <AntdInput {...props} />
+        )
+    },
+    switch: {
+        render: (props: IAntdPropsSwitch) => (
+            <AntdSwitch {...props} />
+        )
+    },
+    inputNumber: {
+        render: (props: IAntdPropsInputNumber) => (
+            <AntdInputNumber {...props} />
         )
     }
 }
@@ -47,6 +59,93 @@ const mapper = {
                         value: 'true'
                     }
                 ]
+            }
+        }
+    ],
+    input: [
+        {
+            key: 'switch',
+            valueStateKey: 'allowClear',
+            props: {
+                inputLabel: 'Allow Clear'
+            }
+        },
+        {
+            key: 'select',
+            valueStateKey: 'size',
+            props: {
+                inputLabel: 'Size',
+                style: {
+                    width: '100%'
+                },
+                placeholder: 'Select size',
+                options: [
+                    {
+                        label: 'Small',
+                        value: 'small'
+                    },
+                    {
+                        label: 'Middle',
+                        value: 'middle'
+                    },
+                    {
+                        label: 'Large',
+                        value: 'large'
+                    }
+                ]
+            }
+        },
+        {
+            key: 'select',
+            valueStateKey: 'type',
+            props: {
+                inputLabel: 'Type',
+                style: {
+                    width: '100%'
+                },
+                placeholder: 'Select type',
+                options: [
+                    {
+                        label: 'Text',
+                        value: 'text'
+                    },
+                    {
+                        label: 'E-mail',
+                        value: 'email'
+                    }
+                ]
+            }
+        },
+        {
+            key: 'switch',
+            valueStateKey: 'showCount',
+            props: {
+                inputLabel: 'Show Text Count'
+            }
+        },
+        {
+            key: 'inputNumber',
+            valueStateKey: 'maxLength',
+            props: {
+                style: {
+                    width: '100%'
+                },
+                placeholder: 'Max Length...',
+                inputLabel: 'Max Length'
+            }
+        },
+        {
+            key: 'switch',
+            valueStateKey: 'bordered',
+            props: {
+                inputLabel: 'Bordered or not'
+            }
+        },
+        {
+            key: 'switch',
+            valueStateKey: 'disabled',
+            props: {
+                inputLabel: 'Is Disabled?'
             }
         }
     ]

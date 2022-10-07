@@ -1,10 +1,22 @@
 import React from 'react'
 import AntdSelect, {IPropsSelect as IAntdPropsSelect} from '../../../form/antd/Select'
+import AntdInput, {IPropsInput as IAntdPropsInput} from '../../../../components/form/antd/Input'
+import AntdSwitch, {IPropsSwitch as IAntdPropsSwitch} from '../../../../components/form/antd/Switch'
 
 const items = {
     select: {
         render: (props: IAntdPropsSelect) => (
             <AntdSelect {...props} />
+        )
+    },
+    input: {
+        render: (props: IAntdPropsSelect) => (
+            <AntdInput {...props} />
+        )
+    },
+    switch: {
+        render: (props: IAntdPropsSwitch) => (
+            <AntdSwitch {...props} />
         )
     }
 }
@@ -46,6 +58,41 @@ const mapper = {
                         value: '12'
                     }
                 ]
+            }
+        }
+    ],
+    input: [
+        {
+            key: 'input',
+            valueStateKey: 'name',
+            props: {
+                style: {
+                    width: '100%'
+                },
+                placeholder: 'Name...',
+                inputLabel: 'Name of parameter to submit'
+            }
+        },
+        {
+            key: 'input',
+            valueStateKey: 'defaultValue',
+            props: {
+                style: {
+                    width: '100%'
+                },
+                placeholder: 'Default value...',
+                inputLabel: 'Default value'
+            }
+        },
+        {
+            key: 'input',
+            valueStateKey: 'placeholder',
+            props: {
+                style: {
+                    width: '100%'
+                },
+                placeholder: 'Placeholder...',
+                inputLabel: 'Placeholder'
             }
         }
     ]

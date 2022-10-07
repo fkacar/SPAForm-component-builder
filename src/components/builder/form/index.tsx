@@ -1,6 +1,7 @@
 import React, {FC, useState, useRef, useEffect} from 'react'
 import {IPropsBuilder} from '../../../types/builder'
 import {makeid} from '../../../utils/calculation'
+import AntdSelect, {IPropsSelect as IAntdPropsSelect} from '../../../components/form/antd/Select'
 import elements from '../../../assets/data/builder/form'
 import LayoutItems from './LayoutItems'
 import DesignItems from './DesignItems'
@@ -10,6 +11,7 @@ import {Row, Col} from 'reactstrap'
 import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd'
 import MovePrefix from '../../../components/builder/general/MovePrefix'
 import {ArrowLeftOutlined} from '@ant-design/icons'
+import {isArr, onClickAfterActions, saveItemProperty} from '../../../utils/builder/form/general'
 import {
     Sidebar,
     SidebarHeader,
@@ -22,7 +24,8 @@ import {
     FormBuilderDDWrapper,
     MainContainer,
     NewFormItemWrapper,
-    SidebarBodyListContent
+    SidebarBodyListContent,
+    SidebarBodyLanguageWrapper
 } from './styles'
 
 const Builder: FC<IPropsBuilder> = ({options}) => {
@@ -41,6 +44,7 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
     ])
     const [activeConfig, setActiveConfig] = useState<string>('')
     const [activeConfigId, setActiveConfigId] = useState<string>('')
+    const [activeConfigItemId, setActiveConfigItemId] = useState<string>('')
     const [isTabsVisible, setCurrentTabsVisible] = useState<boolean>(true)
     const [columns, setColumns] = useState<any[]>([
         {
@@ -65,10 +69,20 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
             ]
         }
     ])
+    const [currentLanguage, setCurrentLanguage] = useState<string>(options?.languages?.[0] || 'en')
     const [customState, setCustomState] = useState<any>({
         columnCount: 2,
         name: 'General',
-        hidden: 'false'
+        hidden: 'false',
+        defaultValue: '',
+        placeholder: '',
+        allowClear: false,
+        size: '',
+        type: '',
+        showCount: false,
+        maxLength: 1000,
+        bordered: true,
+        disabled: false
     })
 
     const onChangeHidden = (value: any) => {
@@ -92,6 +106,13 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
         })
     }
 
+    const onChangeSize = (e: any) => {
+        setCustomState({
+            ...customState,
+            size: e
+        })
+    }
+
     const onChangeName = (e: any) => {
         const name = e.target.value
 
@@ -110,6 +131,66 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
         setCustomState({
             ...customState,
             name
+        })
+    }
+
+    const onChangeDefaultValue = (e: any) => {
+        const value = e.target.value
+
+        setCustomState({
+            ...customState,
+            defaultValue: value
+        })
+    }
+
+    const onChangePlaceholder = (e: any) => {
+        const value = e.target.value
+
+        setCustomState({
+            ...customState,
+            placeholder: value
+        })
+    }
+
+    const onChangeMaxLength = (e: any) => {
+        setCustomState({
+            ...customState,
+            maxLength: e
+        })
+    }
+
+    const onChangeAllowClear = (e: any) => {
+        setCustomState({
+            ...customState,
+            allowClear: e
+        })
+    }
+
+    const onChangeShowCount = (e: any) => {
+        setCustomState({
+            ...customState,
+            showCount: e
+        })
+    }
+
+    const onChangeBordered = (e: any) => {
+        setCustomState({
+            ...customState,
+            bordered: e
+        })
+    }
+
+    const onChangeDisabled = (e: any) => {
+        setCustomState({
+            ...customState,
+            disabled: e
+        })
+    }
+
+    const onChangeType = (e: any) => {
+        setCustomState({
+            ...customState,
+            type: e
         })
     }
 
@@ -149,10 +230,21 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
         const customStateUpdateListeners = {
             columnCount: onChangeColumnCount,
             name: onChangeName,
-            hidden: onChangeHidden
+            hidden: onChangeHidden,
+            defaultValue: onChangeDefaultValue,
+            placeholder: onChangePlaceholder,
+            allowClear: onChangeAllowClear,
+            size: onChangeSize,
+            type: onChangeType,
+            showCount: onChangeShowCount,
+            maxLength: onChangeMaxLength,
+            bordered: onChangeBordered,
+            disabled: onChangeDisabled
         }
 
-        customStateUpdateListeners[key](value)
+        const customStateUpdateListener = customStateUpdateListeners[key]
+
+        if (customStateUpdateListener) customStateUpdateListener(value)
     }
 
     const customStateUpdater = (key, value) => {
@@ -164,8 +256,6 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
         setCustomState(updatedStateObj)
         onChangeCustomState(key, value)
     }
-
-    const isArr = (v: any) => Object.prototype.toString.call(v) === '[object Array]'
 
     const getFormElements = () => {
         return (
@@ -236,6 +326,26 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
         return bodyContent
     }
 
+    const onClickNewFormItem = (id: string) => {
+        const itemId = id.split('_')[0]
+
+        setActiveTab('layout')
+        setActiveConfig(itemId.charAt(0).toUpperCase() + itemId.slice(1))
+        setActiveConfigId(itemId)
+        setActiveConfigItemId(id)
+
+        onClickAfterActions({
+            columns,
+            setColumns,
+            activeConfigId: itemId,
+            customState,
+            setCustomState,
+            activeConfigItemId: id,
+            activeKey,
+            currentLanguage
+        })
+    }
+
     const onChangeTab = (newTabKey: string) => {
         setActiveKey(newTabKey)
     }
@@ -244,6 +354,7 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
         setActiveTab('layout')
         setActiveConfig('Tabs')
         setActiveConfigId('tab')
+        setActiveConfigItemId('tab')
 
         const tabName = currentTabs.find((item: any) => item.key === tabKey).title
 
@@ -303,8 +414,13 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
         setColumns(columnsTemp)
     }
 
+    const getItemFieldValue = (key: string, value: any, languageSpecificParams) => {
+        return isArr(value) && languageSpecificParams.includes(key) ? value.find((l: any) => l.key === currentLanguage)?.value : value
+    }
+
     const getNewFormItemElem = (item: any) => {
         if (!item) return <></>
+        const itemId = item?.id?.split('_')[0] || ''
 
         let props = {
             ...item.defaultProps || {}
@@ -320,8 +436,31 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
                 activeKey,
                 type: 'editable-card'
             }
-            console.log('props', props)
+
             return <Tabs {...props} />
+        }
+
+        if (itemId === 'input') {
+            const column = columns.find((c: any) => c.tabKey === activeKey)
+            let itemInput
+            column.columns.forEach((c: any) => {
+                const foundItem = c.items.find((i: any) => i.id === item.id)
+
+                if (foundItem) itemInput = foundItem
+            })
+
+            props = {
+                ...props,
+                value: getItemFieldValue('defaultValue', itemInput.config.defaultValue, itemInput.config.languageSpecificParams),
+                placeholder: getItemFieldValue('placeholder', itemInput.config.placeholder, itemInput.config.languageSpecificParams),
+                allowClear: itemInput.config.allowClear,
+                size: itemInput.config.size,
+                type: itemInput.config.type,
+                showCount: itemInput.config.showCount,
+                maxLength: itemInput.config.maxLength,
+                bordered: itemInput.config.bordered,
+                disabled: itemInput.config.disabled
+            }
         }
 
         const Element = item.render(props)
@@ -474,6 +613,20 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
     }
 
     useEffect(() => {
+        if (!customState || !activeConfigItemId) return
+
+        saveItemProperty({
+            activeConfigItemId,
+            activeKey,
+            columns,
+            setColumns,
+            customState,
+            languages: options.languages,
+            currentLanguage
+        })
+    }, [customState])
+
+    useEffect(() => {
         const elementList = elements(uiKit)
 
         const items = [...elementList].map((item: any) => ({
@@ -505,6 +658,17 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
                                 </SidebarHeaderTitle>
                             </SidebarHeader>
                             <SidebarBody className="formactor-builder-component__sidebar__body">
+                                <SidebarBodyLanguageWrapper>
+                                    <AntdSelect
+                                        placeholder="Select language"
+                                        options={[
+                                            {
+                                                label: 'English',
+                                                value: 'en'
+                                            }
+                                        ]}
+                                    />
+                                </SidebarBodyLanguageWrapper>
                                 <SidebarBodyHeader>
                                     {
                                         <>
@@ -523,7 +687,7 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
                                                         active={activeTab === 'layout'}
                                                         onClick={() => setActiveTab('layout')}
                                                     >
-                                                        Layout
+                                                        {activeConfigId === 'tab' ? 'Layout' : 'Content'}
                                                     </SidebarBodyHeaderTab>
                                                     <SidebarBodyHeaderTab
                                                         className="formactor-builder-component__sidebar__body__header__tab"
@@ -583,9 +747,14 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
                                                                     >
                                                                         {provided => (
                                                                             <div
-                                                                                ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                                                ref={provided.innerRef}
+                                                                                {...provided.draggableProps}
+                                                                                {...provided.dragHandleProps}
+                                                                            >
                                                                                 <NewFormItemWrapper>
-                                                                                    <MovePrefix/>
+                                                                                    <MovePrefix
+                                                                                        onClick={() => onClickNewFormItem(item.id)}
+                                                                                    />
                                                                                     {getNewFormItemElem(item)}
                                                                                 </NewFormItemWrapper>
                                                                             </div>
