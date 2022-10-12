@@ -6,6 +6,7 @@ export interface IPropsButton {
     className?: string
     value?: string
     onChange?: (e: any) => void
+    onClick?: (e: any) => void
     type: 'primary' | 'ghost' | 'dashed' | 'link' | 'text' | 'default'
     htmlType: 'submit' | 'button' | 'reset'
     buttonLabel: string

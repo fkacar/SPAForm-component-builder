@@ -12,13 +12,17 @@ export interface IPropsTextarea {
     value?: string
     onChange?: (e: any) => void
     rows?: number
+    inputLabel?: string
 }
 
 const TextareaComponent: FC<IPropsTextarea> = (props) => {
-    const {innerRef, onInputKeyDownFn} = props
+    const {innerRef, onInputKeyDownFn, inputLabel} = props
 
     return (
-        <TextArea  {...props} onPressEnter={onInputKeyDownFn} ref={innerRef}/>
+        <>
+            {inputLabel && <div className="input-label">{inputLabel}</div>}
+            <TextArea  {...props} onPressEnter={onInputKeyDownFn} ref={innerRef}/>
+        </>
     )
 }
 

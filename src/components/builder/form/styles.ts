@@ -86,6 +86,9 @@ export const SidebarBodyListContent = styled.div`
   width: 100%;
   height: 100%;
   padding: 0.6rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 65vh;
 
   .input-label {
     font-size: 0.9rem;

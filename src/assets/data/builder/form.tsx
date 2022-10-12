@@ -81,7 +81,12 @@ const itemsAntd = [
             showCount: false,
             maxLength: 1000,
             bordered: true,
-            disabled: false
+            disabled: false,
+            yupTypeErrorMsg: '',
+            yupType: '',
+            yupMethod: '',
+            yupMethods: [],
+            yup: {}
         },
         render: (props: IAntdPropsInput) => (
             <AntdInput {...props} />

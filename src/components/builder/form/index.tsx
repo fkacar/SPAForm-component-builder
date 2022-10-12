@@ -2,6 +2,7 @@ import React, {FC, useState, useRef, useEffect} from 'react'
 import {IPropsBuilder} from '../../../types/builder'
 import {makeid} from '../../../utils/calculation'
 import AntdSelect, {IPropsSelect as IAntdPropsSelect} from '../../../components/form/antd/Select'
+import AntdButton, {IPropsButton as IAntdPropsButton} from '../../../components/form/antd/Button'
 import elements from '../../../assets/data/builder/form'
 import LayoutItems from './LayoutItems'
 import DesignItems from './DesignItems'
@@ -12,6 +13,7 @@ import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd'
 import MovePrefix from '../../../components/builder/general/MovePrefix'
 import {ArrowLeftOutlined} from '@ant-design/icons'
 import {isArr, onClickAfterActions, saveItemProperty} from '../../../utils/builder/form/general'
+import {generator} from '../../../utils/builder/form/generator'
 import {
     Sidebar,
     SidebarHeader,
@@ -82,7 +84,100 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
         showCount: false,
         maxLength: 1000,
         bordered: true,
-        disabled: false
+        disabled: false,
+        yupTypeErrorMsg: '',
+        yupType: '',
+        yupMethod: '',
+        yupMethods: [],
+        yup: {
+            param: {
+                required: {
+                    message: ''
+                },
+                length: {
+                    limit: 0,
+                    message: ''
+                },
+                min: {
+                    limit: 0,
+                    message: ''
+                },
+                max: {
+                    limit: 0,
+                    message: ''
+                },
+                matches: {
+                    regex: '',
+                    message: ''
+                },
+                email: {
+                    message: ''
+                },
+                url: {
+                    message: ''
+                },
+                uuid: {
+                    message: ''
+                },
+                trim: {
+                    message: ''
+                },
+                lowercase: {
+                    message: ''
+                },
+                uppercase: {
+                    message: ''
+                },
+                lessThan: {
+                    max: 0,
+                    message: ''
+                },
+                moreThan: {
+                    min: 0,
+                    message: ''
+                },
+                positive: {
+                    message: ''
+                },
+                negative: {
+                    message: ''
+                },
+                integer: {
+                    message: ''
+                },
+                round: {
+                    type: ''
+                },
+                compact: {
+                    rejector: ''
+                },
+                shape: {
+                    fields: '',
+                    noSortEdges: ''
+                },
+                concat: {
+                    schemaB: ''
+                },
+                pick: {
+                    keys: ''
+                },
+                omit: {
+                    keys: ''
+                },
+                from: {
+                    fromKey: '',
+                    toKey: '',
+                    alias: false
+                },
+                noUnknown: {
+                    onlyKnownKeys: false,
+                    message: ''
+                },
+                of: {
+                    enum: []
+                }
+            }
+        }
     })
 
     const onChangeHidden = (value: any) => {
@@ -224,6 +319,19 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
         })
     }
 
+    const onChangeYupMethod = (value: string) => {
+        const customStateTemp = {...customState}
+
+        if (customStateTemp.yupMethods.findIndex((item: any) => item.method === value) !== -1) return
+
+        customStateTemp.yupMethods.push({
+            method: value,
+            params: customState.yup.param[value]
+        })
+
+        setCustomState(customStateTemp)
+    }
+
     const onChangeCustomState = (key: string, value: any) => {
         if (!key) return
 
@@ -239,7 +347,8 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
             showCount: onChangeShowCount,
             maxLength: onChangeMaxLength,
             bordered: onChangeBordered,
-            disabled: onChangeDisabled
+            disabled: onChangeDisabled,
+            yupMethod: onChangeYupMethod
         }
 
         const customStateUpdateListener = customStateUpdateListeners[key]
@@ -248,9 +357,44 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
     }
 
     const customStateUpdater = (key, value) => {
+        const valueFinal = !!value?.target ? value.target.value : value
+
+        if (!!key && key.includes('_')) {
+            const updatedStateObj = {...customState}
+            const fields = key.split('_')
+            const method = fields.at(-2)
+
+            let lastField: string = ''
+            let lastObj: any = {}
+            fields.forEach((field, index) => {
+                if (!index) {
+                    lastObj = updatedStateObj[field]
+                    lastField = field
+                } else {
+                    if (index !== fields.length - 1) {
+                        lastObj[field] = !!lastObj[field] ? lastObj[field] : {}
+                        lastObj = lastObj[field]
+                        lastField = field
+                    } else {
+                        const typeCheck = ['string', 'number', 'boolean'].includes(typeof value)
+                        const finalValue = typeCheck ? value : value.target.value
+
+                        lastObj[field] = finalValue
+                    }
+                }
+            })
+
+            const methodItem = updatedStateObj.yupMethods.find((item: any) => item.method === method)
+            methodItem.params = updatedStateObj.yup.param
+
+            setCustomState(updatedStateObj)
+            onChangeCustomState(key, value)
+            return
+        }
+
         const updatedStateObj = {
             ...customState,
-            [key]: value
+            [key]: valueFinal
         }
 
         setCustomState(updatedStateObj)
@@ -612,6 +756,17 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
         setActiveTab('elements')
     }
 
+    const getLanguageOptions = () => options.languages.map(language => ({
+        label: language,
+        value: language
+    }))
+
+    const onClickSaveBtn = () => {
+        const generatedSavingObj = generator(columns, currentTabs)
+
+        console.log('generatedSavingObj', generatedSavingObj)
+    }
+
     useEffect(() => {
         if (!customState || !activeConfigItemId) return
 
@@ -661,12 +816,16 @@ const Builder: FC<IPropsBuilder> = ({options}) => {
                                 <SidebarBodyLanguageWrapper>
                                     <AntdSelect
                                         placeholder="Select language"
-                                        options={[
-                                            {
-                                                label: 'English',
-                                                value: 'en'
-                                            }
-                                        ]}
+                                        options={getLanguageOptions()}
+                                        onChange={(value: any) => setCurrentLanguage(value)}
+                                        value={currentLanguage}
+                                    />
+                                    <AntdButton
+                                        type="primary"
+                                        htmlType="button"
+                                        buttonLabel="Save"
+                                        className="ml-1"
+                                        onClick={onClickSaveBtn}
                                     />
                                 </SidebarBodyLanguageWrapper>
                                 <SidebarBodyHeader>

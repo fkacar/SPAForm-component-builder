@@ -24,8 +24,12 @@ export const onClickAfterActions = ({
             return ''
         }
 
-        if (item.languageSpecificParams && item.languageSpecificParams.includes(field)) {
-            return isArr(item.config[field]) ? item.config[field].find((l: any) => l.language === currentLanguage)?.value : item.config[field]
+        if (item.config.languageSpecificParams && item.config.languageSpecificParams.includes(field)) {
+            return isArr(item.config[field]) ? item.config[field].find((l: any) => l.key === currentLanguage)?.value : item.config[field]
+        }
+
+        if (!!item.config[field].target) {
+            return item.config[field].target.value
         }
 
         return item.config[field]
@@ -47,7 +51,12 @@ export const onClickAfterActions = ({
             showCount: getItemSavedProperty('showCount'),
             maxLength: getItemSavedProperty('maxLength'),
             bordered: getItemSavedProperty('bordered'),
-            disabled: getItemSavedProperty('disabled')
+            disabled: getItemSavedProperty('disabled'),
+            yupTypeErrorMsg: getItemSavedProperty('yupTypeErrorMsg'),
+            yupType: getItemSavedProperty('yupType'),
+            yupMethod: getItemSavedProperty('yupMethod'),
+            yupMethods: getItemSavedProperty('yupMethods'),
+            ...(getItemSavedProperty('yup').param ? {yup: getItemSavedProperty('yup')} : {})
         })
     }
 
@@ -78,7 +87,7 @@ export const saveItemProperty = ({
 
         if (foundItem) item = foundItem
     })
-    
+
     if (!item) return console.error('saveItemProperty: Item not found')
 
     Object.keys(item.config).forEach(key => {
@@ -103,7 +112,11 @@ export const saveItemProperty = ({
             })
         }
 
-        if (key !== 'languageSpecificParams') item.config[key] = langValue || customState[key]
+        if (!!customState[key]?.target) {
+            if (key !== 'languageSpecificParams') item.config[key] = langValue || customState[key].target.value
+        } else {
+            if (key !== 'languageSpecificParams') item.config[key] = langValue || customState[key]
+        }
     })
 
     setColumns(columnsStored)
